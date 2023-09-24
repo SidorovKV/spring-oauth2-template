@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api
+          uri: http://127.0.0.1:9090/api/v1
+          predicates:
+            - Path=/api/v1/**
+          filters:
+            - TokenRelay=
+            - RemoveRequestHeader=Cookie
+
+        - id: auth
+          uri: http://127.0.0.1:9009
+          predicates:
+            - Path=/oauth2/**
+            - Path=/login
+            - Path=/registration
+
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          gateway:
+            provider: spring
+            client-id: gateway
+            client-secret: gateway-secret
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri:
+                - "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+        provider:
+          spring:
+            issuer-uri: http://127.0.0.1:9009
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
