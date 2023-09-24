@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -23,6 +24,8 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
@@ -30,6 +33,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Duration;
 import java.util.UUID;
 
 @Configuration(proxyBeanMethods = false)
@@ -58,7 +62,15 @@ public class AuthorizationServerConfig {
                         .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                         .redirectUri("http://127.0.0.1:8080/login/oauth2/code/gateway")
                         .scope(OidcScopes.OPENID)
-                        .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
+                        .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+                        .tokenSettings(TokenSettings.builder()
+                                .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+                                .idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
+                                .accessTokenTimeToLive(Duration.ofSeconds(30 * 60))
+                                .refreshTokenTimeToLive(Duration.ofDays(1))
+                                .reuseRefreshTokens(true)
+                                .build()
+                        )
                         .build(),
                 RegisteredClient.withId(UUID.randomUUID().toString())
                         .clientId("postman")
@@ -69,6 +81,14 @@ public class AuthorizationServerConfig {
                         .redirectUri("http://127.0.0.1:9009/authorized")
                         .scope("postman")
                         .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
+                        .tokenSettings(TokenSettings.builder()
+                                .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+                                .idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
+                                .accessTokenTimeToLive(Duration.ofSeconds(30 * 60))
+                                .refreshTokenTimeToLive(Duration.ofDays(1))
+                                .reuseRefreshTokens(true)
+                                .build()
+                        )
                         .build()
         );
     }
