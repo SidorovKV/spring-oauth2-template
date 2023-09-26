@@ -52,6 +52,11 @@ public class AuthorizationServerConfig {
     }
 
     @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder().issuer("http://127.0.0.1:9009").build();
+    }
+
+    @Bean
     public RegisteredClientRepository registeredClientRepository() {
         return new InMemoryRegisteredClientRepository(
                 RegisteredClient.withId(UUID.randomUUID().toString())
@@ -122,10 +127,5 @@ public class AuthorizationServerConfig {
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
-    }
-
-    @Bean
-    public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().issuer("http://127.0.0.1:9009").build();
     }
 }

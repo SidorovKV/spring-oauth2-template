@@ -24,7 +24,7 @@ public class InMemoryUserCredentialService implements UserDetailsService, UserCr
     public InMemoryUserCredentialService() {
         this.userCredentialRepository = new HashMap<>();
 
-        // Just for to show example. Don't copy that.
+        //<-- Just for to show example. Don't copy that.
         UserCredential admin = new UserCredential();
         admin.setEmail("admin@admin.com");
         admin.setRoles(List.of(Role.ADMIN, Role.USER));
@@ -36,6 +36,7 @@ public class InMemoryUserCredentialService implements UserDetailsService, UserCr
         user.setRoles(List.of(Role.USER));
         user.setPassword(passwordEncoder.encode("user"));
         userCredentialRepository.put(user.getEmail(), user);
+        //-->
     }
 
     @Override

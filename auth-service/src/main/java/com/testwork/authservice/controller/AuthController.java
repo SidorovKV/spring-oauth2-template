@@ -28,7 +28,5 @@ public class AuthController {
     }
 
     @GetMapping("/authorized")
-    public String au() {
-        return "authorized";
-    }
+    public void au() {}
 }
