@@ -1,6 +1,7 @@
 package com.testwork.authservice.user;
 
 import com.testwork.authservice.Role.Role;
+import jakarta.annotation.PostConstruct;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,12 +20,15 @@ import java.util.stream.Collectors;
 @Service
 public class InMemoryUserCredentialService implements UserDetailsService, UserCredentialService {
     private final Map<String, UserCredential> userCredentialRepository;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     public InMemoryUserCredentialService() {
         this.userCredentialRepository = new HashMap<>();
+        this.passwordEncoder = new BCryptPasswordEncoder();
+    }
 
-        //<-- Just for to show example. Don't copy that.
+    @PostConstruct
+    public void addTestUsers() {
         UserCredential admin = new UserCredential();
         admin.setEmail("admin@admin.com");
         admin.setRoles(List.of(Role.ADMIN, Role.USER));
@@ -36,7 +40,6 @@ public class InMemoryUserCredentialService implements UserDetailsService, UserCr
         user.setRoles(List.of(Role.USER));
         user.setPassword(passwordEncoder.encode("user"));
         userCredentialRepository.put(user.getEmail(), user);
-        //-->
     }
 
     @Override
